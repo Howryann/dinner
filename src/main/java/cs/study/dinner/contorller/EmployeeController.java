@@ -44,4 +44,14 @@ public class EmployeeController {
         return R.success("退出成功");
     }
 
+    @PostMapping
+    public R<String> addEmployee(@RequestBody Employee employee) {
+        boolean save = employeeService.save(employee);
+        if (save){
+            //保存成功
+            return R.success("保存成功");
+        }
+        return R.error("保存失败");
+    }
+
 }

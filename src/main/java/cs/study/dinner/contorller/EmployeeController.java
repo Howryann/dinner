@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
+
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
@@ -17,7 +20,7 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @PostMapping("/login")
-    public R<Employee> login(@RequestBody Employee employee){
+    public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee){
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Employee::getUsername, employee.getUsername());
         Employee emp = employeeService.getOne(queryWrapper);
@@ -31,7 +34,14 @@ public class EmployeeController {
         if(emp.getStatus() == 0){
             return R.error("账号被禁用");
         }
+        request.getSession().setAttribute("employee", emp.getId());
         return R.success(emp);
+    }
+
+    @PostMapping("/logout")
+    public R<String> logout(HttpServletRequest request) {
+        request.getSession().removeAttribute("employee");
+        return R.success("退出成功");
     }
 
 }
